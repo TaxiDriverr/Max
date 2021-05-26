@@ -1,97 +1,97 @@
 <template>
-  <div class="box">
-    <div class="Echarts">
-    <div id="main" style="width: 600px;height:400px;"></div>
-  </div>
+  <div className="box">
+    <div className="Echarts">
+      <div id="main" style="width: 600px;height:400px;"></div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Echarts',
-  methods:{
-	 setInterval(){
-		  // 基于准备好的dom，初始化echarts实例
-       option.series[0].pointer.show = false;
-    option.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0;
-    option.series[0].data[1].value = (Math.random() * 100).toFixed(2) - 0;
-    option.series[0].data[2].value = (Math.random() * 100).toFixed(2) - 0;
-    myChart.setOption(option, true);
+  methods: {
+    setInterval () {
+      // 基于准备好的dom，初始化echarts实例
+      option.series[0].pointer.show = false;
+      option.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0;
+      option.series[0].data[1].value = (Math.random() * 100).toFixed(2) - 0;
+      option.series[0].data[2].value = (Math.random() * 100).toFixed(2) - 0;
+      myChart.setOption(option, true);
 
-		  var myChart = this.$echarts.init(document.getElementById('main'),'dark');
+      var myChart = this.$echarts.init(document.getElementById('main'), 'dark');
 
-		  // 指定图表的配置项和数据
-		  var option  = {
-    series: [{
-        type: 'gauge',
-        startAngle: 90,
-        endAngle: -270,
-        pointer: {
+      // 指定图表的配置项和数据
+      var option = {
+        series: [{
+          type: 'gauge',
+          startAngle: 90,
+          endAngle: -270,
+          pointer: {
             show: false
-        },
-        progress: {
+          },
+          progress: {
             show: true,
             overlap: false,
             roundCap: true,
             clip: false,
             itemStyle: {
-                borderWidth: 1,
-                borderColor: '#464646'
+              borderWidth: 1,
+              borderColor: '#464646'
             }
-        },
-        axisLine: {
+          },
+          axisLine: {
 
             lineStyle: {
-                width: 40
+              width: 40
             }
-        },
-        splitLine: {
+          },
+          splitLine: {
             show: false,
             distance: 0,
             length: 10
-        },
-        axisTick: {
+          },
+          axisTick: {
             show: false
-        },
-        axisLabel: {
+          },
+          axisLabel: {
             show: false,
             distance: 50
-        },
-        data: [{
+          },
+          data: [{
             value: 20,
             name: 'Perfect',
             title: {
-                offsetCenter: ['0%', '-30%']
+              offsetCenter: ['0%', '-30%']
             },
             detail: {
-                offsetCenter: ['0%', '-20%']
+              offsetCenter: ['0%', '-20%']
             }
-        },
-        {
-            value: 40,
-            name: 'Good',
-            title: {
+          },
+            {
+              value: 40,
+              name: 'Good',
+              title: {
                 offsetCenter: ['0%', '0%']
-            },
-            detail: {
+              },
+              detail: {
                 offsetCenter: ['0%', '10%']
-            }
-        },
-        {
-            value: 60,
-            name: 'Commonly',
-            title: {
-                offsetCenter: ['0%', '30%']
+              }
             },
-            detail: {
+            {
+              value: 60,
+              name: 'Commonly',
+              title: {
+                offsetCenter: ['0%', '30%']
+              },
+              detail: {
                 offsetCenter: ['0%', '40%']
+              }
             }
-        }
-        ],
-        title: {
+          ],
+          title: {
             fontSize: 14
-        },
-        detail: {
+          },
+          detail: {
             width: 50,
             height: 14,
             fontSize: 14,
@@ -100,21 +100,20 @@ export default {
             borderRadius: 20,
             borderWidth: 1,
             formatter: '{value}%'
-        }
-    }]
-};
+          }
+        }]
+      };
 
-		  // 使用刚指定的配置项和数据显示图表。
-		 option && myChart.setOption(option);
-		  }
+      // 使用刚指定的配置项和数据显示图表。
+      option && myChart.setOption(option);
+    }
   },
-  mounted() {
-  	this.setInterval();
+  mounted () {
+    this.setInterval();
   }
 }
 </script>
 
 <style>
-
 
 </style>

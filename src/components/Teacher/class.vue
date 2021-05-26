@@ -1,174 +1,241 @@
 <template>
-  <el-row class="tac">
-    <div>
-      
-    
-  </div>
-    <div class="left">
-      <el-col :span="3.5">
-      <el-menu
-        default-active="1"
-        class="el-menu-vertical-demo">
-        
-        <el-menu-item index="1">
-          <i class="el-icon-menu"></i>
-          <span slot="title">我管理的班级</span>
-        </el-menu-item>
-        <!-- <el-menu-item index="2">
-          <i class="el-icon-document"></i>
-          <span slot="title">2班</span>
-        </el-menu-item> -->
-        <el-menu-item index="3">
-          <i class="el-icon-setting"></i>
-          <span slot="title">添加班级</span>
-        </el-menu-item>
-      </el-menu>
-    </el-col>
+  <el-card class="box-card">
+    <span id="title">
+      班级信息管理列表
+    </span>
+    <el-button type="plain" @click="dialogFormVisible = true">
+      <i class="el-icon-plus"></i> 添加班级</el-button>
+    <!--    <el-button plain><i class="el-icon-search"></i>  搜 索</el-button>-->
+    <div id="search_f">
+      <el-autocomplete
+        v-model="state"
+        :fetch-suggestions="querySearchAsync"
+        id="search_"
+        placeholder="请输入班级名"
+        prefix-icon="el-icon-search"
+        @select="handleSelect"
+      ></el-autocomplete>
     </div>
-    <div class="right">
-      <div class="title">
-        学生信息管理列表
-        
-      </div>
-      
-      
-      <div class="tab">
-        
-        
-      <el-table
-    :data="tableData"
-    border
-    style="width: 100%">
-     <el-table-column
-      prop="name"
-      label="姓名"
-      width="180">
-    </el-table-column>
-    <el-table-column
-      prop="id"
-      label="学号"
-      width="180">
-    </el-table-column>
-    <el-table-column
-      prop="tele"
-      label="手机号"
-      width="180">
-    </el-table-column>
-    <el-table-column
-      prop="sex"
-      label="性别"
-       width="180px">
-    </el-table-column>
-    <el-table-column
-      prop="psw"
-      label="密码"
-       width="180px">
-    </el-table-column>
 
-    
-   <el-table-column width="180">
-        <el-button type="primary" icon="el-icon-edit" circle></el-button>
-        <el-button type="success" icon="el-icon-check" circle></el-button>
-        <el-button type="danger" icon="el-icon-delete" circle></el-button>
-          
-      
-    </el-table-column>
-     
-    
-  </el-table>
+    <div id="dialog">
+      <el-dialog title="添加教师"
+                 :visible.sync="dialogFormVisible">
+        <el-form :model="form"
+                 :rules="loginRules"
+                 ref="form"
+                 id="createForm">
+          <el-form-item label="教师姓名" prop="name" :label-width="formLabelWidth">
+            <el-input v-model="form.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="教师电话" prop="phone" :label-width="formLabelWidth">
+            <el-input v-model="form.phone" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="教师性别" prop="sex" :label-width="formLabelWidth">
+            <el-select v-model="form.sex" placeholder="请选择教师性别">
+              <el-option label="男" value="男"></el-option>
+              <el-option label="女" value="女"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="CreateTeacher">确 定</el-button>
+          <el-button plain @click="resetForm('form')">重 置</el-button>
+          <el-button @click="Cancel">取 消</el-button>
+        </div>
+      </el-dialog>
     </div>
-    </div>
-  </el-row>
-  
+
+    <el-table
+      :data="tableData"
+      border
+      style="width: 100%">
+      <el-table-column
+        prop="index"
+        label="序号"
+        type="index"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="name"
+        label="班级名"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="number"
+        label="人数"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="date"
+        label="创建日期"
+        width="180px">
+      </el-table-column>
+      <el-table-column>
+        <!--        <el-button type="primary" @click="edit" icon="el-icon-edit" circle></el-button>-->
+        <!--        <el-button type="success" @click="finish" icon="el-icon-check" circle></el-button>-->
+        <el-button type="danger" @click="deleteUser()" icon="el-icon-delete" circle></el-button>
+      </el-table-column>
+    </el-table>
+
+  </el-card>
 </template>
-
 <script>
-  export default {
-    data() {
-      return {
-        tableData: [{
-         tele: '138830000',
-          name: '王小虎',
-          psw: '123456',
-          sex:'男',
-          id:'200700'
-        }, {
-          tele: '138830000',
-          name: '王小虎',
-          psw: '123456',
-          sex:'男',
-          id:'200700'
-        }, {
-          tele: '138830000',
-          name: '王小虎',
-          psw: '123456',
-          sex:'男',
-          id:'200700'
-        }, {
-          tele: '138830000',
-          name: '王小虎',
-          psw: '123456',
-          sex:'男',
-          id:'200700'
-           }, {
-          tele: '138830000',
-          name: '王小虎',
-          psw: '123456',
-          sex:'男',
-          id:'200700'
-        }, {
-         tele: '138830000',
-          name: '王小虎',
-          psw: '123456',
-          sex:'男',
-          id:'200700'
-        }]
-      }
+export default {
+  data () {
+    return {
+      gridData: [{
+        date: '2016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        date: '2016-05-04',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        date: '2016-05-01',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }],
+      dialogTableVisible: false,
+      dialogFormVisible: false,
+      form: {
+        name: '',
+        phone: '',
+        sex: ''
+      },
+      formLabelWidth: '120px',
+      tableData: [{
+        phone: '12345',
+        name: '王小虎',
+        sex: '男',
+        psw: '123456'
+      }, {
+        phone: '2016-05-04',
+        name: '王小虎',
+        sex: '男',
+        psw: '123456'
+      }, {
+        phone: '2016-05-03',
+        name: '王小虎',
+        sex: '男',
+        psw: '123456',
+        index: ''
+      }],
+      loginRules: {
+        name: [
+          {required: true, message: '请输入姓名', trigger: 'blur'},
+          {
+            min: 2,
+            max: 10,
+            message: '长度在 2 到 10 个字符',
+            trigger: 'blur',
+          },
+        ],
+        phone: [
+          {required: true, message: '请输入电话', trigger: 'blur'},
+          {
+            min: 7,
+            max: 11,
+            message: '长度在 7 到 11 个字符',
+            trigger: 'blur',
+          },
+        ],
+        sex: [
+          {required: true, message: '请选择教师性别', trigger: 'blur'},
+        ]
+      },
+    }
+  },
+  methods: {
+    CreateTeacher () {
+      if (this.form.sex && this.form.name && this.form.phone
+        && this.form.name.length >= 2 && this.form.name.length <= 10
+        && this.form.phone.length >= 7 && this.form.phone.length <= 11) {
+        let length = this.form.phone.length
+        let psw = this.form.phone.slice(length - 4, length)
+        this.tableData.unshift({
+          name: this.form.name.toString(),
+          phone: this.form.phone.toString(),
+          sex: this.form.sex,
+          psw: psw
+        })
+        this.$message({
+          type: 'success',
+          message: '添加成功'
+        })
+        this.dialogFormVisible = false
+      } else {
+        alert('添加失败')
+      };
+    },
+    resetForm (form) {
+      this.$refs[form].resetFields();
+      this.form.sex = '';
+    },
+    Cancel(){
+      this.dialogFormVisible = false
     }
   }
+}
 </script>
 
-<style>
-.el-menu-item{
-  font-size: 18px;
-  width: 200px;
-  height: 70px;
+<style scoped Lang="less">
+#title {
+  /* width: 480px; */
+  font: 30px bold;
+  margin-top: 30px;
+  height: 35px;
+  display: block;
+}
+
+.box-card {
+  background-color: #fff;
+  //margin: 10px;
+  height: 800px;
   text-align: center;
-  line-height: 70px;
-  
+  /* width: 480px; */
 }
-.tab{
-  width: 1080px;
-  margin:0 auto ;
-  margin-top: 80px;
-  margin-left: 200px;
-  /* background-color: rgb(245, 245, 245); */
 
+.el-radio-group {
+  line-height: 30px;
 }
-.right{
-  height: 100%;
-  width: 800px;
-  /* background-color: rgb(197, 129, 129); */
-  /* margin-left: 20px; */
+
+#search_f {
+  display: inline;
 }
-/* .right{
-  background-color: rgb(83, 79, 79);
-  height: 800px;
-} */
-/* .left{
-  width: 100px;
-  height: 800px;
-} */
-.title {
-    /* width: 480px; */
-    font:30px bold ;
-    margin: 20px;
-    margin-bottom: 60px;
-    margin-top:50px ;
-    margin-left:540px ;
 
-  }
+#search_f.el-autocomplete {
+  height: 60px;
+}
 
+#className > > > .el-input {
+  width: 250px;
+}
 
+#createForm {
+  width: 200px;
+  height: 200px;
+  margin-left: 100px
+}
 
+#dialog > > > .el-dialog {
+  height: 600px;
+}
+
+#dialog >>> .el-dialog__body{
+  padding: 0 0 30px 0;
+}
+
+#head > > > .el-dialog__header {
+  height: 100px;
+}
+
+#bottom > > > .dialog-footer {
+  height: 100px;
+  margin: 0 0 30px 80px;
+}
 </style>

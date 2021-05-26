@@ -1,33 +1,49 @@
 <template>
   <el-card class="box-card">
-    <div class="title">
+    <span id="title">
       教师信息管理列表
+    </span>
+    <el-button type="plain" @click="dialogFormVisible = true">
+      <i class="el-icon-plus"></i> 添加教师</el-button>
+<!--    <el-button plain><i class="el-icon-search"></i>  搜 索</el-button>-->
+    <div id="search_f">
+    <el-autocomplete
+      v-model="state"
+      :fetch-suggestions="querySearchAsync"
+      id="search_"
+      placeholder="请输入姓名或电话"
+      prefix-icon="el-icon-search"
+      @select="handleSelect"
+    ></el-autocomplete>
     </div>
-    <el-form
-      :model="formInline"
-      :inline="true"
-      :rules="loginRules"
-      ref="formInline"
-      class="demo-form-inline">
-      <el-form-item>添加教师</el-form-item>
-      <el-form-item prop="name">
-        <el-input v-model="formInline.name" placeholder="请输入教师姓名"></el-input>
-      </el-form-item>
 
-      <el-form-item prop="phone">
-        <el-input v-model="formInline.phone" placeholder="请输入教师电话"></el-input>
-      </el-form-item>
-
-      <el-radio-group :inline="true" v-model="formInline.sex" prop="sex">
-        <el-radio-button label="男"></el-radio-button>
-        <el-radio-button label="女"></el-radio-button>
-      </el-radio-group>
-
-      <el-form-item>
-        <el-button type="primary" @click="CreateTeacher" id="createButton">添加</el-button>
-        <el-button plain @click="resetForm('formInline')">重置</el-button>
-      </el-form-item>
-    </el-form>
+    <div id="dialog">
+    <el-dialog title="添加教师"
+               :visible.sync="dialogFormVisible">
+      <el-form :model="form"
+               :rules="loginRules"
+               ref="form"
+               id="createForm">
+        <el-form-item label="教师姓名" prop="name" :label-width="formLabelWidth">
+          <el-input v-model="form.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="教师电话" prop="phone" :label-width="formLabelWidth">
+          <el-input v-model="form.phone" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="教师性别" prop="sex" :label-width="formLabelWidth">
+          <el-select v-model="form.sex" placeholder="请选择教师性别">
+            <el-option label="男" value="男"></el-option>
+            <el-option label="女" value="女"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="CreateTeacher">确 定</el-button>
+        <el-button plain @click="resetForm('form')">重 置</el-button>
+        <el-button @click="Cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+    </div>
 
     <el-table
       :data="tableData"
@@ -54,30 +70,44 @@
         label="性别"
         width="180px">
       </el-table-column>
-      <el-table-column
-        prop="psw"
-        label="密码(默认手机号后四位)"
-        width="180px">
-      </el-table-column>
       <el-table-column>
         <!--        <el-button type="primary" @click="edit" icon="el-icon-edit" circle></el-button>-->
         <!--        <el-button type="success" @click="finish" icon="el-icon-check" circle></el-button>-->
         <el-button type="danger" @click="deleteUser()" icon="el-icon-delete" circle></el-button>
       </el-table-column>
     </el-table>
+
   </el-card>
 </template>
-
 <script>
 export default {
   data () {
     return {
-      formInline: {
-        name: [],
-        phone: [],
-        sex: '',
-        psw: ''
+      gridData: [{
+        date: '2016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        date: '2016-05-04',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        date: '2016-05-01',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }],
+      dialogTableVisible: false,
+      dialogFormVisible: false,
+      form: {
+        name: '',
+        phone: '',
+        sex: ''
       },
+      formLabelWidth: '120px',
       tableData: [{
         phone: '12345',
         name: '王小虎',
@@ -114,43 +144,57 @@ export default {
             trigger: 'blur',
           },
         ],
+        sex: [
+          {required: true, message: '请选择教师性别', trigger: 'blur'},
+        ]
       },
     }
   },
   methods: {
     CreateTeacher () {
-      if (this.formInline.sex && this.formInline.name && this.formInline.phone
-        && this.formInline.name.length >= 2 && this.formInline.name.length <= 10
-      && this.formInline.phone.length >= 7 && this.formInline.phone.length <= 11) {
-        let length = this.formInline.phone.length
-        let psw = this.formInline.phone.slice(length - 4, length)
-        this.tableData.push({
-          name: this.formInline.name.toString(),
-          phone: this.formInline.phone.toString(),
-          sex: this.formInline.sex,
+      if (this.form.sex && this.form.name && this.form.phone
+        && this.form.name.length >= 2 && this.form.name.length <= 10
+        && this.form.phone.length >= 7 && this.form.phone.length <= 11) {
+        let length = this.form.phone.length
+        let psw = this.form.phone.slice(length - 4, length)
+        this.tableData.unshift({
+          name: this.form.name.toString(),
+          phone: this.form.phone.toString(),
+          sex: this.form.sex,
           psw: psw
         })
+        this.$message({
+          type: 'success',
+          message: '添加成功'
+        })
+        this.dialogFormVisible = false
       } else {
-        alert('添加失败');
-      }
+        alert('添加失败')
+      };
     },
-    resetForm (formName) {
-      this.$refs[formName].resetFields()
+    resetForm (form) {
+      this.$refs[form].resetFields();
+      this.form.sex = '';
     },
+    Cancel(){
+      this.dialogFormVisible = false
+    }
   }
 }
 </script>
 
 <style scoped Lang="less">
-.title {
+#title {
   /* width: 480px; */
   font: 30px bold;
-  margin: 20px 0 60px 0;
+  margin-top: 30px;
+  height: 35px;
+  display: block;
 }
 
 .box-card {
-  background-color: rgb(233, 233, 233);
-  margin: 20px;
+  background-color: #fff;
+  //margin: 10px;
   height: 800px;
   text-align: center;
   /* width: 480px; */
@@ -160,7 +204,38 @@ export default {
   line-height: 30px;
 }
 
-#createButton {
-  margin-left: 14px;
+#search_f {
+  display: inline;
+}
+
+#search_f.el-autocomplete {
+  height: 60px;
+}
+
+#className > > > .el-input {
+  width: 250px;
+}
+
+#createForm {
+  width: 200px;
+  height: 200px;
+  margin-left: 100px
+}
+
+#dialog > > > .el-dialog {
+  height: 600px;
+}
+
+#dialog >>> .el-dialog__body{
+  padding: 0 0 30px 0;
+}
+
+#head > > > .el-dialog__header {
+  height: 100px;
+}
+
+#bottom > > > .dialog-footer {
+  height: 100px;
+  margin: 0 0 30px 80px;
 }
 </style>

@@ -1,60 +1,76 @@
 <template>
   <el-card class="box-card">
-    <div class="title">
-      班级信息管理列表
+    <span id="title">班级信息管理列表</span>
+    <el-button type="plain" @click="dialogFormVisible = true" id="createButton">
+      <i class="el-icon-plus"></i> 创建班级
+    </el-button>
+    <div id="search_f">
+      <el-autocomplete
+        id="search"
+        v-model="state"
+        :fetch-suggestions="querySearchAsync"
+        placeholder="请输入班级名或教师"
+        prefix-icon="el-icon-search"
+        @select="handleSelect"
+      ></el-autocomplete>
     </div>
-    <el-form
-      :model="formInline"
-      :inline="true"
-      :rules="loginRules"
-      ref="formInline"
-      class="demo-form-inline">
-      <el-form-item>添加班级</el-form-item>
-      <el-form-item prop="name">
-        <el-input v-model="formInline.name" placeholder="请输入班级名"></el-input>
-      </el-form-item>
 
-      <!--      <el-radio-group :inline="true" v-model="formInline.sex" prop="sex">-->
-      <!--        <el-radio-button label="男"></el-radio-button>-->
-      <!--        <el-radio-button label="女"></el-radio-button>-->
-      <!--      </el-radio-group>-->
-
-      <el-select v-model="value" filterable placeholder="请选择教师">
-        <el-option
-          v-for="item in teacher_options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-
-      <el-form-item>
-        <el-button type="primary" id="createButton" @click="createClass">创建</el-button>
-        <el-button plain >重置</el-button>
-
-      </el-form-item>
-    </el-form>
+    <div id="dialog">
+      <el-dialog title="创建班级"
+                 :visible.sync="dialogFormVisible"
+                 center="true"
+                 width="35%">
+        <el-form :model="form"
+                 :rules="loginRules"
+                 ref="form"
+                 id="createForm">
+          <el-form-item label="班级名" prop="name" id="className">
+            <el-input v-model="form.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="教师" prop="teacher">
+            <el-select v-model="form.teacher" filterable placeholder="请选择教师">
+              <el-option
+                v-for="item in teacher_options"
+                :label="item.label"
+                :value="item.label">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div id="bottom">
+          <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="createClass">确 定</el-button>
+            <el-button plain @click="resetForm('form')">重 置</el-button>
+            <el-button @click="Cancel">取 消</el-button>
+          </div>
+        </div>
+      </el-dialog>
+    </div>
 
     <el-table
       :data="tableData"
       ref="table"
       border
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column
         prop="index"
         label="序号"
         type="index"
-        width="180">
+        width="130"
+        height="40">
       </el-table-column>
       <el-table-column
         prop="class"
         label="班级名"
-        width="180">
+        width="130"
+        height="40">
       </el-table-column>
       <el-table-column
         prop="teacher"
         label="任课老师"
-        width="180px">
+        width="130px"
+        height="40">
       </el-table-column>
       <el-table-column>
         <!--        <el-button type="primary" @click="edit" icon="el-icon-edit" circle></el-button>-->
@@ -62,24 +78,28 @@
         <el-button type="danger" @click="deleteUser()" icon="el-icon-delete" circle></el-button>
       </el-table-column>
     </el-table>
+    <el-pagination
+      background
+      layout="prev, pager, next"
+      :total="2">
+    </el-pagination>
   </el-card>
 </template>
 <script>
 export default {
   data () {
     return {
-      formInline: {
+      form: {
         name: '',
         teacher: ''
       },
-      value:{
-        value:'',
-        label:''
+      value: {
+        value: '',
+        label: ''
       },
       tableData: [{
         class: '一班',
         teacher: '王小虎',
-
       }, {
         class: '一班',
         teacher: '王小虎',
@@ -97,6 +117,9 @@ export default {
             trigger: 'blur',
           },
         ],
+        teacher: [
+          {required: true, message: '请选择教师性别', trigger: 'blur'},
+        ]
       },
       teacher_options: [{
         value: '1',
@@ -108,50 +131,51 @@ export default {
         value: '3',
         label: '路人甲'
       }],
+      // dialogTableVisible: false,
+      dialogFormVisible: false,
     }
   },
-  methods:{
-    createClass(){
-        if (this.formInline.name && this.formInline.name.length >= 2 && this.formInline.name.length <= 10) {
-          this.tableData.push({
-            name: this.formInline.name.toString(),
-            teacher: this.value.label
-          })
-        } else {
-          alert('添加失败');
-        }
+  methods: {
+    createClass () {
+      if (this.form.name) {
+        this.tableData.unshift({
+          class: this.form.name.toString(),
+          teacher: this.form.teacher,
+        })
+        this.$message({
+          type: 'success',
+          message: '创建成功'
+        })
+        this.dialogFormVisible = false
+      } else {
+        alert('添加失败')
+      }
+    },
+    resetForm (form) {
+      this.$refs[form].resetFields()
+      this.value = ''
+    },
+    Cancel () {
+      this.dialogFormVisible = false
     }
   }
-  // mounted () {
-  //   bus.$on('passValue', function (msg){
-  //     // data.teacher_options.push({
-  //     //   value : localStorage.counter.toString(),
-  //     //   label: msg
-  //     // });
-  //     alert(msg);
-  //   })
-  // },
-  // created () {
-  //   bus.$on('passValue', (value) => {
-  //
-  //     console.log(value)
-  //     })
-  // }
 }
 
 </script>
 
 <style scoped Lang="less">
-.title {
+#title {
   /* width: 480px; */
   font: 30px bold;
-  margin: 20px 0 60px 0;
+  margin-top: 30px;
+  height: 35px;
+  display: block;
 }
 
 .box-card {
-  background-color: rgb(233, 233, 233);
-   height: 800px;
-  margin: 20px;
+  background-color: #fff;
+  //margin: 10px;
+  height: 800px;
   text-align: center;
   /* width: 480px; */
 }
@@ -160,7 +184,38 @@ export default {
   line-height: 30px;
 }
 
-#createButton {
-  margin-left: 14px;
+#search_f {
+  display: inline;
+}
+
+#search_f.el-autocomplete {
+  height: 60px;
+}
+
+#className > > > .el-input {
+  width: 250px;
+}
+
+#createForm {
+  width: 200px;
+  height: 200px;
+  margin-left: 100px
+}
+
+#dialog > > > .el-dialog {
+  height: 600px;
+}
+
+#dialog >>> .el-dialog__body{
+  padding: 0 0 30px 0;
+}
+
+#head > > > .el-dialog__header {
+  height: 100px;
+}
+
+#bottom > > > .dialog-footer {
+  height: 100px;
+  margin: 0 0 30px 80px;
 }
 </style>
